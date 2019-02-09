@@ -1,0 +1,10 @@
+FROM python
+
+ENV APP=/twarf
+WORKDIR $APP
+
+ADD . $APP
+
+RUN pip install molotov
+
+CMD molotov

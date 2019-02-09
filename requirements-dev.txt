@@ -1,0 +1,6 @@
+--editable .[dev]
+pudb
+ipython
+tox
+flake8
+mypy

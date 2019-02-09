@@ -1,0 +1,11 @@
+FROM python
+
+ENV TWARF=/twarf
+WORKDIR $TWARF
+
+ADD . $TWARF
+
+RUN pip install --requirement requirements-dev.txt
+
+
+CMD python -m twarf

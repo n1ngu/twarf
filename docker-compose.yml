@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+
+  backend:
+    image: httpd
+
+  probe:
+    build:
+      context: .
+      dockerfile: Dockerfile-probe
+    volumes:
+      - "./:/twarf"
+    depends_on:
+      - backend
+    environment:
+      - MOLOTOV_TARGET=http://backend
+      - MOLOTOV_TIMEOUT=1
+
+  waf:
+    build:
+      context: .
+      dockerfile: Dockerfile-twarf
+    volumes:
+      - "./:/twarf"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - backend
+    command: python -m twarf twarf.rules.default backend 80

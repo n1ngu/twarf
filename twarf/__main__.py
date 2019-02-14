@@ -76,7 +76,7 @@ def main():
 
     twisted.internet.reactor.listenTCP(
         8000,
-        twarf.proxy.ProxyFactory(
+        twarf.proxy.TwarfFactory(
             args.rules, args.host, args.port
         )
     )

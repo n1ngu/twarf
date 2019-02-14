@@ -107,36 +107,32 @@ class TwarfRequest(twisted.web.http.Request):
         self.reactor = reactor
 
     def process(self):
-        for condition, rule in self.channel.factory.rules:
-            if condition(self):
-                rule(self)
-                break
+        self.reactor.callLater(
+            0,
+            twisted.internet.defer.ensureDeferred(
+                self.channel.factory.rules(self)
+            )
+        )
 
     def temporary_redirect(self, url):
         self.setResponseCode(http.HTTPStatus.TEMPORARY_REDIRECT)
         self.setHeader(b"location", url)
 
 
-class ReverseProxy(twisted.web.http.HTTPChannel):
-    """
-    Implements a simple reverse proxy.
-
-    For details of usage, see the file examples/reverse-proxy.py.
-    """
-
+class TwarfProxy(twisted.web.http.HTTPChannel):
     requestFactory = TwarfRequest
 
 
-class ProxyFactory(twisted.internet.protocol.ServerFactory):
+class TwarfFactory(twisted.internet.protocol.ServerFactory):
 
-    protocol = ReverseProxy
+    protocol = TwarfProxy
 
     def __init__(
             self, rules: str, host: str, port: int,
             reactor=twisted.internet.reactor):
         print('initiated proxy towards {}:{}'.format(host, port))
         rules_module = importlib.import_module(rules)
-        self.rules = rules_module.TWARF_RULES
+        self.rules = rules_module.twarf_rules(reactor)
         self.session = twarf.service.session.SessionService()
         self.host = host
         self.port = port

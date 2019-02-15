@@ -33,3 +33,17 @@ class SessionService():
         ).encode('ascii')
         await self.put(key, value)
         return key
+
+
+class SetCookie():
+
+    def __init__(self, service, next_):
+        self.service = service
+        self.next = next_
+
+    async def process(self, request):
+        session_id = self.received_cookies.get(b'TWARFSESSIONID')
+        if not session_id:
+            cookie = await self.service.new()
+        else:
+            await self.next(request)

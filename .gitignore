@@ -12,6 +12,9 @@ _trial_temp*
 *.so
 *~
 
+.bash_history
+.ipython/
+.python_history
 .venv/
 .config/
 

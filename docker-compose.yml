@@ -18,9 +18,7 @@ services:
       - MOLOTOV_TIMEOUT=1
 
   waf:
-    build:
-      context: .
-      dockerfile: Dockerfile-twarf
+    build: .
     volumes:
       - "./:/twarf"
     ports:

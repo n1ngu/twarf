@@ -4,14 +4,14 @@ EXPOSE 8000
 
 ARG UID=1000
 ARG GID=1000
-ARG APPDIR=/app
+ARG APPDIR=/twarf
 ENV PIPENV_VENV_IN_PROJECT=1
 ENV PIPENV_SHELL=bash
 
 RUN true \
-    && groupadd app \
+    && groupadd twarf \
         --gid $GID \
-    && useradd app \
+    && useradd twarf \
         --gid $GID \
         --uid $UID \
         --create-home \
@@ -19,8 +19,8 @@ RUN true \
 
 # RUN pip install --requirement requirements-dev.txt
 RUN pip install --upgrade pip pipenv tox
-COPY --chown=app:app ./ $APPDIR
+COPY --chown=twarf:twarf ./ $APPDIR
 
-USER app
+USER twarf
 WORKDIR $APPDIR
 CMD pipenv run python -m twarf

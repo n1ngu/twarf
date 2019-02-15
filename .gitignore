@@ -12,6 +12,9 @@ _trial_temp*
 *.so
 *~
 
+.venv/
+.config/
+
 # due to using tox and pytest
 .tox
 .cache

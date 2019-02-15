@@ -2,7 +2,6 @@
 import os
 
 import twisted.web.proxy
-import twisted.web.http
 import twisted.internet.endpoints
 
 
@@ -27,8 +26,7 @@ class AForward():
             request.content.read(),
             request
         )
-        # FIXME: await this?
-        self.endpoint.connect(clientFactory)
+        await self.endpoint.connect(clientFactory)
 
 
 def twarf_rules(reactor):

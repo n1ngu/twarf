@@ -107,16 +107,15 @@ class TwarfRequest(twisted.web.http.Request):
         self.reactor = reactor
 
     def process(self):
-        self.reactor.callLater(
-            0,
-            twisted.internet.defer.ensureDeferred(
-                self.channel.factory.rules(self)
-            )
-        )
+        coro = self.channel.factory.rules(self)
+        self.deferred = twisted.internet.defer.ensureDeferred(coro)
 
     def temporary_redirect(self, url):
         self.setResponseCode(http.HTTPStatus.TEMPORARY_REDIRECT)
         self.setHeader(b"location", url)
+
+    def connectionLost(self, reason):
+        super().connectionLost(reason)
 
 
 class TwarfProxy(twisted.web.http.HTTPChannel):
@@ -128,19 +127,13 @@ class TwarfFactory(twisted.internet.protocol.ServerFactory):
     protocol = TwarfProxy
 
     def __init__(
-            self, rules: str, host: str, port: int,
+            self,
+            rules: str,
             reactor=twisted.internet.reactor):
-        print('initiated proxy towards {}:{}'.format(host, port))
         rules_module = importlib.import_module(rules)
         self.rules = rules_module.twarf_rules(reactor)
-        self.session = twarf.service.session.SessionService()
-        self.host = host
-        self.port = port
-        self.endpoint = twisted.internet.endpoints.TCP4ClientEndpoint(
-            reactor,
-            self.host,
-            self.port,
-        )
+        # TODO: Instantiate session service in the rules
+        # self.session = twarf.service.session.SessionService()
 
     def log(self, *args, **kwargs):
         pass

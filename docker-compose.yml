@@ -27,4 +27,7 @@ services:
       - "8000:8000"
     depends_on:
       - backend
-    command: python -m twarf twarf.rules.default backend 80
+    environment:
+      - TWARF_FORWARD_HOST=backend
+      - TWARF_FORWARD_PORT=80
+    command: python -m twarf twarf.rules.forward 8000

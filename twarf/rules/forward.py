@@ -6,7 +6,7 @@ import twisted.web.http
 import twisted.internet.endpoints
 
 
-def AForward():
+class AForward():
 
     def __init__(self, reactor, host, port):
         self.host = host
@@ -27,13 +27,14 @@ def AForward():
             request.content.read(),
             request
         )
-        await self.endpoint.connect(clientFactory)
+        # FIXME: await this?
+        self.endpoint.connect(clientFactory)
 
 
 def twarf_rules(reactor):
     forward = AForward(
         reactor,
         os.environ['TWARF_FORWARD_HOST'],
-        os.environ['TWARF_FORWARD_PORT']
+        int(os.environ['TWARF_FORWARD_PORT'])
     )
     return forward.process

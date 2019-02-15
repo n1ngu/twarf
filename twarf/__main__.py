@@ -3,11 +3,7 @@ import sys
 import argparse
 import logging.config
 
-import twisted.internet.reactor
-# from twisted.web import proxy, server
-import twisted.web.server
-
-import twarf.proxy
+import twarf.app
 
 
 def _logging_cfg(verbosity: int):
@@ -61,7 +57,6 @@ def _get_parser():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('rules')
-    parser.add_argument('host')
     parser.add_argument('port', type=ipv4_port_type)
     parser.add_argument('--verbose', '-v', action='count')
     return parser
@@ -74,15 +69,12 @@ def main():
         _logging_cfg(args.verbose)
     )
 
-    twisted.internet.reactor.listenTCP(
-        8000,
-        twarf.proxy.TwarfFactory(
-            args.rules, args.host, args.port
-        )
-    )
+    import twisted.internet.reactor
+    app = twarf.app.Twarf(
+        args,
+        twisted.internet.reactor)
     try:
-        print('Listening on port 8000')
-        twisted.internet.reactor.run()
+        app.run()
     except KeyboardInterrupt:
         pass
 

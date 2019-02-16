@@ -7,7 +7,6 @@ from twarf.rules import True_
 from twarf.rules import False_
 from twarf.rules import Yes
 from twarf.rules import Not
-from twarf.rules import Or
 
 
 class BoolTest(AsyncTestCase):
@@ -128,7 +127,7 @@ class OrTest(AsyncTestCase):
         request = Mock()
 
         self.assertTrue(
-            await Or(a, b)(request)
+            await (Yes(a) | Yes(b))(request)
         )
 
         a.assert_called_once_with(request)
@@ -141,7 +140,7 @@ class OrTest(AsyncTestCase):
         request = Mock()
 
         self.assertTrue(
-            await Or(a, b)(request)
+            await (Yes(a) | Yes(b))(request)
         )
 
         a.assert_called_once_with(request)
@@ -154,7 +153,7 @@ class OrTest(AsyncTestCase):
         request = Mock()
 
         self.assertTrue(
-            await Or(a, b)(request)
+            await (Yes(a) | Yes(b))(request)
         )
 
         a.assert_called_once_with(request)
@@ -167,7 +166,7 @@ class OrTest(AsyncTestCase):
         request = Mock()
 
         self.assertFalse(
-            await Or(a, b)(request)
+            await (Yes(a) | Yes(b))(request)
         )
 
         a.assert_called_once_with(request)

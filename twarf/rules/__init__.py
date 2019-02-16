@@ -19,6 +19,9 @@ class TwarfTest():
     def __and__(self, other):
         return And(self, other)
 
+    def __or__(self, other):
+        return Or(self, other)
+
     async def test(self, request) -> bool:
         raise NotImplementedError()
 

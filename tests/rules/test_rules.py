@@ -171,3 +171,58 @@ class OrTest(AsyncTestCase):
 
         a.assert_called_once_with(request)
         b.assert_called_once_with(request)
+
+
+class XorTest(AsyncTestCase):
+
+    async def test_true_true(self):
+
+        a = Mock(return_value=futurized(True))
+        b = Mock(return_value=futurized(True))
+        request = Mock()
+
+        self.assertFalse(
+            await (Yes(a) ^ Yes(b))(request)
+        )
+
+        a.assert_called_once_with(request)
+        b.assert_called_once_with(request)
+
+    async def test_true_false(self):
+
+        a = Mock(return_value=futurized(True))
+        b = Mock(return_value=futurized(False))
+        request = Mock()
+
+        self.assertTrue(
+            await (Yes(a) ^ Yes(b))(request)
+        )
+
+        a.assert_called_once_with(request)
+        b.assert_called_once_with(request)
+
+    async def test_false_true(self):
+
+        a = Mock(return_value=futurized(False))
+        b = Mock(return_value=futurized(True))
+        request = Mock()
+
+        self.assertTrue(
+            await (Yes(a) ^ Yes(b))(request)
+        )
+
+        a.assert_called_once_with(request)
+        b.assert_called_once_with(request)
+
+    async def test_false_false(self):
+
+        a = Mock(return_value=futurized(False))
+        b = Mock(return_value=futurized(False))
+        request = Mock()
+
+        self.assertFalse(
+            await (Yes(a) ^ Yes(b))(request)
+        )
+
+        a.assert_called_once_with(request)
+        b.assert_called_once_with(request)

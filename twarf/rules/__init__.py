@@ -22,6 +22,9 @@ class TwarfTest():
     def __or__(self, other):
         return Or(self, other)
 
+    def __xor__(self, other):
+        return Xor(self, other)
+
     async def test(self, request) -> bool:
         raise NotImplementedError()
 
@@ -75,3 +78,13 @@ class Or(TwarfTest):
         return (
             await self.a(request) or await self.b(request)
         )
+
+
+class Xor(TwarfTest):
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    async def test(self, request) -> bool:
+        return (await self.a(request) ^ await self.b(request))

@@ -53,7 +53,8 @@ def twarf_rules(reactor):
         # import asyncio
         # from twarf.rules.auth import sha256x10
         # loop = asyncio.get_event_loop()
-        # print(loop.run_until_complete())
+        # coro = sha256x10(b"yoursecret")
+        # print(loop.run_until_complete(coro))
         return {
             b'jane': b'supersecret'
         }.get(user)

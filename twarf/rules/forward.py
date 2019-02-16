@@ -17,7 +17,7 @@ class AForward():
             port,
         )
 
-    async def process(self, request):
+    async def __call__(self, request):
         request.requestHeaders.setRawHeaders(
             b"host",
             [self.host.encode('ascii')]
@@ -32,5 +32,4 @@ class AForward():
 
 
 def twarf_rules(reactor):
-    forward = AForward(reactor)
-    return forward.process
+    return AForward(reactor)

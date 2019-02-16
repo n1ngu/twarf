@@ -16,7 +16,7 @@ COOKIE = b'TWARFSESSIONID'
 
 class GetCookie():
 
-    async def process(self, request):
+    async def __call__(self, request):
         return request.received_cookies.get(COOKIE)
 
 
@@ -25,7 +25,7 @@ class SetCookie():
     def __init__(self, service):
         self.service = service
 
-    async def process(self, request):
+    async def __call__(self, request):
         cookie = await self.service.new()
         request.addCookie(COOKIE, cookie)
         request.temporary_redirect(request.uri)
@@ -35,10 +35,11 @@ class SetCookie():
 
 
 def twarf_rules(reactor):
+
     session_service = twarf.service.session.SessionService()
-    rules = If(
+
+    return If(
         test=GetCookie(),
         then=AForward(reactor),
         orelse=SetCookie(session_service)
     )
-    return rules.process

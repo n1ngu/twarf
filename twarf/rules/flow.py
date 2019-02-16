@@ -1,5 +1,14 @@
 
+import http
+
+import twisted.web.http
+
+import twarf
+
 from . import TwarfRule
+
+
+SERVER = b'Twarf/%s' % twarf.__version__.encode()
 
 
 class If(TwarfRule):
@@ -14,3 +23,18 @@ class If(TwarfRule):
             await self.then(request)
         else:
             await self.orelse(request)
+
+
+class Finish(TwarfRule):
+
+    async def __call__(self, request):
+        request.setHeader(b'server', SERVER)
+        request.setHeader(b'date', twisted.web.http.datetimeToString())
+        request.finish()
+
+
+class BadRequest(Finish):
+
+    async def __call__(self, request):
+        request.setResponseCode(http.HTTPStatus.BAD_REQUEST)
+        await super().__call__(request)

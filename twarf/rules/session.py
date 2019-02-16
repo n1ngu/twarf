@@ -1,17 +1,15 @@
 
 import os
 
-import twisted.web.http
-
-import twarf
 import twarf.service.session
 
 from . import TwarfRule
 from .flow import If
+from .flow import Finish
+from .flow import BadRequest
 from .forward import AForward
 
 
-SERVER = b'Twarf/%s' % twarf.__version__.encode()
 COOKIE = b'TWARFSESSIONID'
 
 
@@ -21,7 +19,7 @@ class GetCookie(TwarfRule):
         return request.received_cookies.get(COOKIE)
 
 
-class SetCookie(TwarfRule):
+class SetCookie(Finish):
 
     def __init__(self, service):
         self.service = service
@@ -30,9 +28,19 @@ class SetCookie(TwarfRule):
         cookie = await self.service.new()
         request.addCookie(COOKIE, cookie)
         request.temporary_redirect(request.uri)
-        request.setHeader(b'server', SERVER)
-        request.setHeader(b'date', twisted.web.http.datetimeToString())
-        request.finish()
+        await super().__call__(request)
+
+
+class MatchCookie(TwarfRule):
+
+    def __init__(self, service, value):
+        self.service = service
+        self.value = value
+
+    async def __call__(self, request):
+        cookie = request.received_cookies.get(COOKIE)
+        session = await self.service.get(cookie)
+        return session == self.value
 
 
 def twarf_rules(reactor) -> TwarfRule:
@@ -41,6 +49,10 @@ def twarf_rules(reactor) -> TwarfRule:
 
     return If(
         test=GetCookie(),
-        then=AForward(reactor),
+        then=If(
+            test=MatchCookie(session_service, 0),
+            then=AForward(reactor),
+            orelse=BadRequest()
+        ),
         orelse=SetCookie(session_service)
     )

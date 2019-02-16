@@ -53,18 +53,12 @@ class Unauthorized(HttpStatus):
     http_status = http.HTTPStatus.UNAUTHORIZED
 
 
-class BadRequest(Finish):
-
-    async def __call__(self, request):
-        request.setResponseCode(http.HTTPStatus.BAD_REQUEST)
-        await super().__call__(request)
+class BadRequest(HttpStatus):
+    http_status = http.HTTPStatus.BAD_REQUEST
 
 
-class InternalServerError(Finish):
-
-    async def __call__(self, request):
-        request.setResponseCode(http.HTTPStatus.INTERNAL_SERVER_ERROR)
-        await super().__call__(request)
+class InternalServerError(HttpStatus):
+    http_status = http.HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 class Unreachable(InternalServerError):

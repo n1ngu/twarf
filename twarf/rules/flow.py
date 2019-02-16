@@ -40,6 +40,12 @@ class TempRedirect(Finish):
         await super().__call__(request)
 
 
+class Unauthorized(Finish):
+
+    async def __call__(self, request):
+        request.setResponseCode(http.HTTPStatus.UNAUTHORIZED)
+        await super().__call__(request)
+
 
 class BadRequest(Finish):
 

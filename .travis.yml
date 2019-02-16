@@ -1,0 +1,9 @@
+language: python
+
+install:
+  - pip install --upgrade pip tox
+
+script:
+  - tox
+
+cache: pip

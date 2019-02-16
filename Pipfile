@@ -10,7 +10,7 @@ flake8 = "*"
 mypy = "*"
 
 [packages]
-twarf = {editable = true,path = "."}
+twarf = {editable = true,extras = ["dev"],path = "."}
 
 [requires]
 python_version = "3.7"

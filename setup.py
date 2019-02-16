@@ -47,8 +47,14 @@ setup(
         'twisted',
         'cryptography',
     ],
+    tests_require=[
+        'aiounittest',
+    ],
     extras_require={
-        'dev': ['check-manifest'],
+        'dev': [
+            'check-manifest',
+            'aiounittest',
+        ],
     },
     entry_points={
         'console_scripts': [

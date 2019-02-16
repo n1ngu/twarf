@@ -7,7 +7,6 @@ from twarf.rules import True_
 from twarf.rules import False_
 from twarf.rules import Yes
 from twarf.rules import Not
-from twarf.rules import And
 from twarf.rules import Or
 
 
@@ -65,30 +64,6 @@ class BoolTest(AsyncTestCase):
         coro.assert_called_once_with(request)
 
 
-class InvertTest(AsyncTestCase):
-
-    async def test_true(self):
-
-        a = Mock(return_value=futurized(True))
-        request = Mock()
-        test = ~Yes(a)
-
-        self.assertFalse(await test(request))
-
-        a.assert_called_once_with(request)
-
-    async def test_false(self):
-
-        a = Mock(return_value=futurized(False))
-        request = Mock()
-
-        self.assertTrue(
-            await Not(a)(request)
-        )
-
-        a.assert_called_once_with(request)
-
-
 class AndTest(AsyncTestCase):
 
     async def test_true_true(self):
@@ -98,7 +73,7 @@ class AndTest(AsyncTestCase):
         request = Mock()
 
         self.assertTrue(
-            await And(a, b)(request)
+            await (Yes(a) & Yes(b))(request)
         )
 
         a.assert_called_once_with(request)
@@ -111,7 +86,7 @@ class AndTest(AsyncTestCase):
         request = Mock()
 
         self.assertFalse(
-            await And(a, b)(request)
+            await (Yes(a) & Yes(b))(request)
         )
 
         a.assert_called_once_with(request)
@@ -124,7 +99,7 @@ class AndTest(AsyncTestCase):
         request = Mock()
 
         self.assertFalse(
-            await And(a, b)(request)
+            await (Yes(a) & Yes(b))(request)
         )
 
         a.assert_called_once_with(request)
@@ -137,7 +112,7 @@ class AndTest(AsyncTestCase):
         request = Mock()
 
         self.assertFalse(
-            await And(a, b)(request)
+            await (Yes(a) & Yes(b))(request)
         )
 
         a.assert_called_once_with(request)

@@ -16,6 +16,9 @@ class TwarfTest():
     def __invert__(self):
         return Not(self)
 
+    def __and__(self, other):
+        return And(self, other)
+
     async def test(self, request) -> bool:
         raise NotImplementedError()
 

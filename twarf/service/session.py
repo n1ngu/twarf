@@ -4,6 +4,8 @@ import random
 
 import twisted.internet.defer
 
+import twarf
+
 
 def deferred(coroutine):
     def deferrer(*args, **kwargs):
@@ -37,13 +39,21 @@ class SessionService():
 
 class SetCookie():
 
+    SERVER = b'Twarf/%s' % twarf.__version__.encode()
+    COOKIE = b'TWARFSESSIONID'
+
     def __init__(self, service, next_):
         self.service = service
         self.next = next_
 
     async def process(self, request):
-        session_id = self.received_cookies.get(b'TWARFSESSIONID')
+        session_id = request.received_cookies.get(self.COOKIE)
         if not session_id:
             cookie = await self.service.new()
+            request.addCookie(self.COOKIE, cookie)
+            request.temporary_redirect(request.uri)
+            request.setHeader(b'server', self.SERVER)
+            request.setHeader(b'date', twisted.web.http.datetimeToString())
+            request.finish()
         else:
-            await self.next(request)
+            await self.next.process(request)

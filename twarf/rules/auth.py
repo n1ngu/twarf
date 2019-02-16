@@ -1,5 +1,4 @@
 
-import http
 import hashlib
 import asyncio
 
@@ -14,16 +13,12 @@ REALM = b"Twarf"
 
 class BasicAuth(Unauthorized):
 
-
     def __init__(self, service, fwd):
         self.service = service
         self.fwd = fwd
 
     async def __call__(self, request):
-        
-        if await self.service.auth(
-                request.getUser(), request.getPassword()
-                ):
+        if await self.service.auth(request.getUser(), request.getPassword()):
             # FIXME: clean authroization credentials from the forwarded
             # request so that they dont get leaked upstream
             await self.fwd(request)
@@ -35,11 +30,11 @@ class BasicAuth(Unauthorized):
             await super().__call__(request)
 
 
-async def plain(secret:bytes):
+async def plain(secret: bytes):
     return secret
 
 
-async def sha256x10(secret:bytes):
+async def sha256x10(secret: bytes):
     hash_ = secret
     salt = b'jump!'
     for _ in range(10):
@@ -54,7 +49,7 @@ async def sha256x10(secret:bytes):
 
 def twarf_rules(reactor):
 
-    async def secrets(user:bytes):
+    async def secrets(user: bytes):
         # import asyncio
         # from twarf.rules.auth import sha256x10
         # loop = asyncio.get_event_loop()

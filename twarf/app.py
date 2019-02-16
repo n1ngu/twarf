@@ -18,7 +18,6 @@ class Twarf():
             options.port,
             twarf.proxy.TwarfFactory(rules)
         )
-    
+
     def run(self):
         self.reactor.run()
-

@@ -1,6 +1,7 @@
 
 import logging
 
+
 class LoggingService():
 
     # FIXME: I am synchronous!

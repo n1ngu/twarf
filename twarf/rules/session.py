@@ -1,13 +1,10 @@
 
-import os
-
 import twarf.service.session
 
 from . import TwarfRule
 from .flow import If
 from .http import TempRedirect
 from .http import BadRequest
-from .flow import Unreachable
 from .forward import Forward
 
 

@@ -1,8 +1,4 @@
 
-import string
-import random
-
-
 class ListService():
 
     # FIXME: I am synchronous!
@@ -19,8 +15,8 @@ class ListService():
     async def clear(self):
         self.list.clear()
 
-    async def update(self, list_:set):
+    async def update(self, list_: set):
         self.list.update(list_)
-    
+
     async def contains(self, key) -> bool:
         return key in self.list

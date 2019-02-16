@@ -7,6 +7,7 @@ class TwarfRule():
     async def __call__(self, request):
         await asyncio.sleep(0)
 
+
 class TwarfTest():
 
     async def __call__(self, request) -> bool:

@@ -17,8 +17,8 @@ class IfTest(AsyncTestCase):
 
         await If(
             test=test,
-            then=then, 
-            orelse=orelse, 
+            then=then,
+            orelse=orelse,
         )(request)
 
         test.assert_called_once_with(request)
@@ -34,8 +34,8 @@ class IfTest(AsyncTestCase):
 
         await If(
             test=test,
-            then=then, 
-            orelse=orelse, 
+            then=then,
+            orelse=orelse,
         )(request)
 
         test.assert_called_once_with(request)

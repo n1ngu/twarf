@@ -3,7 +3,6 @@ from unittest.mock import Mock
 from aiounittest import AsyncTestCase
 from aiounittest import futurized
 
-from twarf.rules import TwarfRule
 from twarf.rules import True_
 from twarf.rules import False_
 from twarf.rules import Yes

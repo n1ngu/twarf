@@ -8,6 +8,7 @@ from .flow import If
 from .flow import Finish
 from .flow import TempRedirect
 from .flow import BadRequest
+from .flow import Unreachable
 from .forward import Forward
 
 
@@ -52,12 +53,9 @@ def twarf_rules(reactor) -> TwarfRule:
         then=Forward(reactor),
         orelse=If(
             test=GetCookie(),
-            then=If(
-                test=MatchCookie(session_service, None),
-                # Too agressive? Cookies may get naturally old
-                then=BadRequest(),
-                orelse=TempRedirect(),
-            ),
+            # Too agressive? Cookies may get naturally old, or a simple
+            # restart of a naive memory session service may forgot them
+            then=BadRequest(),
             orelse=SetCookie(session_service),
         ),
     )

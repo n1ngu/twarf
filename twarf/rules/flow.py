@@ -46,3 +46,18 @@ class BadRequest(Finish):
     async def __call__(self, request):
         request.setResponseCode(http.HTTPStatus.BAD_REQUEST)
         await super().__call__(request)
+
+
+class InternalServerError(Finish):
+
+    async def __call__(self, request):
+        request.setResponseCode(http.HTTPStatus.INTERNAL_SERVER_ERROR)
+        await super().__call__(request)
+
+
+class Unreachable(InternalServerError):
+
+    async def __call__(self, request):
+        # FIXME: issue warning through logging service
+        print("FATAL: request reached unreachable rule")
+        await super().__call__(request)

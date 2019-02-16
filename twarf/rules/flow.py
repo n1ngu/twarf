@@ -33,6 +33,15 @@ class Finish(TwarfRule):
         request.finish()
 
 
+class HttpStatus(Finish):
+
+    http_status = None
+
+    async def __call__(self, request):
+        request.setResponseCode(self.http_status)
+        await super().__call__(request)
+
+
 class TempRedirect(Finish):
 
     async def __call__(self, request):
@@ -40,11 +49,8 @@ class TempRedirect(Finish):
         await super().__call__(request)
 
 
-class Unauthorized(Finish):
-
-    async def __call__(self, request):
-        request.setResponseCode(http.HTTPStatus.UNAUTHORIZED)
-        await super().__call__(request)
+class Unauthorized(HttpStatus):
+    http_status = http.HTTPStatus.UNAUTHORIZED
 
 
 class BadRequest(Finish):

@@ -5,14 +5,14 @@ import asyncio
 
 import twarf.service.auth
 
-from . import TwarfRule
+from .flow import Unauthorized
 from .forward import Forward
 
 
 REALM = b"Twarf"
 
 
-class BasicAuth(TwarfRule):
+class BasicAuth(Unauthorized):
 
 
     def __init__(self, service, fwd):
@@ -28,12 +28,11 @@ class BasicAuth(TwarfRule):
             # request so that they dont get leaked upstream
             await self.fwd(request)
         else:
-            request.setResponseCode(http.HTTPStatus.UNAUTHORIZED)
             request.setHeader(
                 b"WWW-Authenticate",
                 b'Basic realm="%s", charset="UTF-8"' % REALM
             )
-            request.finish()
+            await super().__call__(request)
 
 
 async def plain(secret:bytes):

@@ -15,53 +15,66 @@ from twarf.rules import Or
 class BoolTest(AsyncTestCase):
 
     async def test_true(self):
-        request = Mock()
-        self.assertTrue(
-            await True_()(request)
-        )
+        self.assertTrue(await True_()(Mock()))
 
     async def test_false(self):
+        self.assertFalse(await False_()(Mock()))
+
+    async def test_yes(self):
         request = Mock()
-        self.assertFalse(
-            await False_()(request)
-        )
+        true_ = Mock(return_value=futurized(True))
+        false_ = Mock(return_value=futurized(False))
+
+        self.assertTrue(await Yes(true_)(request))
+        self.assertFalse(await Yes(false_)(request))
+
+        true_.assert_called_once_with(request)
+        false_.assert_called_once_with(request)
+
+    async def test_not(self):
+        request = Mock()
+        true_ = Mock(return_value=futurized(True))
+        false_ = Mock(return_value=futurized(False))
+
+        self.assertFalse(await Not(true_)(request))
+        self.assertTrue(await Not(false_)(request))
+
+        true_.assert_called_once_with(request)
+        false_.assert_called_once_with(request)
+
+    async def test_invert(self):
+        request = Mock()
+
+        coro = Mock(return_value=futurized(True))
+        test = ~Yes(coro)
+        self.assertFalse(await test(request))
+        coro.assert_called_once_with(request)
+
+        coro = Mock(return_value=futurized(False))
+        test = ~Yes(coro)
+        self.assertTrue(await test(request))
+        coro.assert_called_once_with(request)
+
+        coro = Mock(return_value=futurized(True))
+        test = ~(~Yes(coro))
+        self.assertTrue(await test(request))
+        coro.assert_called_once_with(request)
+
+        coro = Mock(return_value=futurized(False))
+        test = ~(~Yes(coro))
+        self.assertFalse(await test(request))
+        coro.assert_called_once_with(request)
 
 
-class YesTest(AsyncTestCase):
+class InvertTest(AsyncTestCase):
 
     async def test_true(self):
 
         a = Mock(return_value=futurized(True))
         request = Mock()
+        test = ~Yes(a)
 
-        self.assertTrue(
-            await Yes(a)(request)
-        )
-
-        a.assert_called_once_with(request)
-
-    async def test_false(self):
-
-        a = Mock(return_value=futurized(False))
-        request = Mock()
-
-        self.assertFalse(
-            await Yes(a)(request)
-        )
-
-        a.assert_called_once_with(request)
-
-
-class NotTest(AsyncTestCase):
-
-    async def test_true(self):
-
-        a = Mock(return_value=futurized(True))
-        request = Mock()
-
-        self.assertFalse(
-            await Not(a)(request)
-        )
+        self.assertFalse(await test(request))
 
         a.assert_called_once_with(request)
 

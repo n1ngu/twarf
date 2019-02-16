@@ -13,6 +13,9 @@ class TwarfTest():
     async def __call__(self, request) -> bool:
         return await self.test(request)
 
+    def __invert__(self):
+        return Not(self)
+
     async def test(self, request) -> bool:
         raise NotImplementedError()
 

@@ -6,8 +6,9 @@ import twarf.service.session
 from . import TwarfRule
 from .flow import If
 from .flow import Finish
+from .flow import TempRedirect
 from .flow import BadRequest
-from .forward import AForward
+from .forward import Forward
 
 
 COOKIE = b'TWARFSESSIONID'
@@ -19,7 +20,7 @@ class GetCookie(TwarfRule):
         return request.received_cookies.get(COOKIE)
 
 
-class SetCookie(Finish):
+class SetCookie(TempRedirect):
 
     def __init__(self, service):
         self.service = service
@@ -27,7 +28,6 @@ class SetCookie(Finish):
     async def __call__(self, request):
         cookie = await self.service.new()
         request.addCookie(COOKIE, cookie)
-        request.temporary_redirect(request.uri)
         await super().__call__(request)
 
 
@@ -48,11 +48,16 @@ def twarf_rules(reactor) -> TwarfRule:
     session_service = twarf.service.session.SessionService()
 
     return If(
-        test=GetCookie(),
-        then=If(
-            test=MatchCookie(session_service, 0),
-            then=AForward(reactor),
-            orelse=BadRequest()
+        test=MatchCookie(session_service, 0),
+        then=Forward(reactor),
+        orelse=If(
+            test=GetCookie(),
+            then=If(
+                test=MatchCookie(session_service, None),
+                # Too agressive? Cookies may get naturally old
+                then=BadRequest(),
+                orelse=TempRedirect(),
+            ),
+            orelse=SetCookie(session_service),
         ),
-        orelse=SetCookie(session_service)
     )

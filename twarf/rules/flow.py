@@ -33,6 +33,14 @@ class Finish(TwarfRule):
         request.finish()
 
 
+class TempRedirect(Finish):
+
+    async def __call__(self, request):
+        request.temporary_redirect(request.uri)
+        await super().__call__(request)
+
+
+
 class BadRequest(Finish):
 
     async def __call__(self, request):

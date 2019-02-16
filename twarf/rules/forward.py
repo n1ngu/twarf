@@ -7,7 +7,7 @@ import twisted.internet.endpoints
 from . import TwarfRule
 
 
-class AForward(TwarfRule):
+class Forward(TwarfRule):
 
     def __init__(self, reactor,
             host=os.environ['TWARF_FORWARD_HOST'],
@@ -34,4 +34,4 @@ class AForward(TwarfRule):
 
 
 def twarf_rules(reactor):
-    return AForward(reactor)
+    return Forward(reactor)

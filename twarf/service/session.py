@@ -5,6 +5,8 @@ import random
 
 class SessionService():
 
+    # FIXME: I am synchronous!
+
     _LEN = 64
     _BASE = string.digits + string.ascii_letters
 

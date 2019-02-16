@@ -1,5 +1,6 @@
 
 import os
+import asyncio
 
 import twisted.web.proxy
 import twisted.internet.endpoints
@@ -31,6 +32,17 @@ class Forward(TwarfRule):
             request
         )
         await self.endpoint.connect(clientFactory)
+
+
+class Throttle(TwarfRule):
+
+    def __init__(self, fwd, delay=0):
+        self.fwd = fwd
+        self.delay = delay
+
+    async def __call__(self, request):
+        await asyncio.sleep(self.delay)
+        await self.fwd(request)
 
 
 def twarf_rules(reactor):

@@ -5,7 +5,7 @@ import asyncio
 
 import twarf.service.auth
 
-from .flow import Unauthorized
+from .http import Unauthorized
 from .forward import Forward
 
 

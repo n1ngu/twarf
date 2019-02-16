@@ -5,9 +5,8 @@ import twarf.service.session
 
 from . import TwarfRule
 from .flow import If
-from .flow import Finish
-from .flow import TempRedirect
-from .flow import BadRequest
+from .http import TempRedirect
+from .http import BadRequest
 from .flow import Unreachable
 from .forward import Forward
 

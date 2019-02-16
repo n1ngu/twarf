@@ -34,16 +34,13 @@ class Yes(TwarfTest):
         self.a = a
 
     async def test(self, request) -> bool:
-        return await self.a(request)
+        return bool(await self.a(request))
 
 
-class Not(TwarfTest):
-
-    def __init__(self, a):
-        self.a = a
+class Not(Yes):
 
     async def test(self, request) -> bool:
-        return not await self.a(request)
+        return not await super().test(request)
 
 
 class And(TwarfTest):

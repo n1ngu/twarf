@@ -34,8 +34,6 @@ class TwarfFactory(twisted.internet.protocol.ServerFactory):
 
     def __init__(self, rules):
         self.rules = rules
-        # TODO: Instantiate session service in the rules
-        # self.session = twarf.service.session.SessionService()
 
     def log(self, *args, **kwargs):
         pass

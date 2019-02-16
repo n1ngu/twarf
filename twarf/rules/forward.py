@@ -7,7 +7,9 @@ import twisted.internet.endpoints
 
 class AForward():
 
-    def __init__(self, reactor, host, port):
+    def __init__(self, reactor,
+            host=os.environ['TWARF_FORWARD_HOST'],
+            port=int(os.environ['TWARF_FORWARD_PORT'])):
         self.host = host
         self.endpoint = twisted.internet.endpoints.TCP4ClientEndpoint(
             reactor,
@@ -30,9 +32,5 @@ class AForward():
 
 
 def twarf_rules(reactor):
-    forward = AForward(
-        reactor,
-        os.environ['TWARF_FORWARD_HOST'],
-        int(os.environ['TWARF_FORWARD_PORT'])
-    )
+    forward = AForward(reactor)
     return forward.process

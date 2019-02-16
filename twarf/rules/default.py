@@ -1,12 +1,6 @@
 
-import os
-
-import twarf.rules.forward
-import twarf.service.session
+import twarf.rules.session
 
 
 def twarf_rules(reactor):
-    session_service = twarf.service.session.SessionService()
-    forward = twarf.rules.forward.AForward(reactor)
-    set_cookie = twarf.service.session.SetCookie(session_service, forward)
-    return set_cookie.process
+    return twarf.rules.session.twarf_rules(reactor)

@@ -1,5 +1,8 @@
 
-class If():
+from . import TwarfRule
+
+
+class If(TwarfRule):
 
     def __init__(self, test, then, orelse):
         self.test = test

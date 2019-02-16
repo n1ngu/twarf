@@ -6,6 +6,7 @@ import twisted.web.http
 import twarf
 import twarf.service.session
 
+from . import TwarfRule
 from .flow import If
 from .forward import AForward
 
@@ -14,13 +15,13 @@ SERVER = b'Twarf/%s' % twarf.__version__.encode()
 COOKIE = b'TWARFSESSIONID'
 
 
-class GetCookie():
+class GetCookie(TwarfRule):
 
     async def __call__(self, request):
         return request.received_cookies.get(COOKIE)
 
 
-class SetCookie():
+class SetCookie(TwarfRule):
 
     def __init__(self, service):
         self.service = service
@@ -34,7 +35,7 @@ class SetCookie():
         request.finish()
 
 
-def twarf_rules(reactor):
+def twarf_rules(reactor) -> TwarfRule:
 
     session_service = twarf.service.session.SessionService()
 

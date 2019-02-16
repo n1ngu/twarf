@@ -4,8 +4,10 @@ import os
 import twisted.web.proxy
 import twisted.internet.endpoints
 
+from . import TwarfRule
 
-class AForward():
+
+class AForward(TwarfRule):
 
     def __init__(self, reactor,
             host=os.environ['TWARF_FORWARD_HOST'],

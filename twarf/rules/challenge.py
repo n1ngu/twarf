@@ -43,10 +43,11 @@ class RedirectChallenge(Finish):
         else:
             challenge = await self.crypto_srv.encrypt(b'challenge1')
             referer = urllib.parse.quote_from_bytes(request.uri).encode()
-            # FIXME use urllib.parse to build redirection uri
-            request.temporary_redirect(
-                b'/' + challenge + b'?referer=%s' % referer
+            query = urllib.parse.urlencode({b'referer': referer}).encode()
+            location = urllib.parse.urlunparse(
+                (None, None, challenge, None, query, None)
             )
+            request.temporary_redirect(location)
             await super().process(request)
 
 

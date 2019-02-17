@@ -50,16 +50,10 @@ class RedirectChallenge(Finish):
             await super().process(request)
 
 
-class Unchallenge(TwarfTest):
-
-    def __init__(self, service, value):
-        self.service = service
-        self.value = value
-
-    async def test(self, request):
-        cookie = request.received_cookies.get(COOKIE)
-        session = await self.service.get(cookie)
-        return session == self.value
+# TODO: html meta redirect challenge
+# TODO: js redirect challenge
+# TODO: js payload challenge
+# TODO: captchas!
 
 
 def twarf_rules(reactor) -> TwarfRule:

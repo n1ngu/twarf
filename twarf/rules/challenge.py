@@ -1,4 +1,6 @@
 
+import urllib.parse
+
 import twarf.service.session
 import twarf.service.crypto
 
@@ -24,19 +26,27 @@ class RedirectChallenge(Finish):
         self.session_srv = session_srv
 
     async def process(self, request):
-        uri = request.uri
-        passed = await self.crypto_srv.decrypt(uri[1:])
+        uri = urllib.parse.urlparse(
+            request.uri
+        )
+        passed = await self.crypto_srv.decrypt(uri.path[1:])
         if passed and passed == b'challenge1':
             cookie = request.received_cookies.get(COOKIE)
-            # FIXME: referer header might not be present, redirect to 
-            # previous URI through query parameter
-            referer = request.getHeader(b'referer')
+            query = urllib.parse.parse_qs(uri.query)
+            quoted_referers = query.get(b'referer')
+            if not quoted_referers:
+                raise NotImplementedError("")  # TODO: 400 BadRequest
+            referer = urllib.parse.unquote_to_bytes(quoted_referers[0])
             await self.session_srv.put(cookie, self.next_challenge)
             request.temporary_redirect(referer)
             await super().process(request)
         else:
             challenge = await self.crypto_srv.encrypt(b'challenge1')
-            request.temporary_redirect(challenge)
+            referer = urllib.parse.quote_from_bytes(request.uri).encode()
+            # FIXME use urllib.parse to build redirection uri
+            request.temporary_redirect(
+                b'/' + challenge + b'?referer=%s' % referer
+            )
             await super().process(request)
 
 

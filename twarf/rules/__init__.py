@@ -1,11 +1,11 @@
 
-import asyncio
-
-
 class TwarfRule():
 
     async def __call__(self, request):
-        await asyncio.sleep(0)
+        await self.process(request)
+
+    async def process(self, request):
+        raise NotImplementedError()
 
 
 class TwarfTest():

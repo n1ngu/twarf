@@ -17,7 +17,7 @@ class BasicAuth(Unauthorized):
         self.service = service
         self.fwd = fwd
 
-    async def __call__(self, request):
+    async def process(self, request):
         if await self.service.auth(request.getUser(), request.getPassword()):
             # FIXME: clean authroization credentials from the forwarded
             # request so that they dont get leaked upstream
@@ -27,7 +27,7 @@ class BasicAuth(Unauthorized):
                 b"WWW-Authenticate",
                 b'Basic realm="%s", charset="UTF-8"' % REALM
             )
-            await super().__call__(request)
+            await super().process(request)
 
 
 async def plain(secret: bytes):

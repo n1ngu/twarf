@@ -20,7 +20,7 @@ class Forward(TwarfRule):
             port,
         )
 
-    async def __call__(self, request):
+    async def process(self, request):
         request.requestHeaders.setRawHeaders(
             b"host",
             [self.host.encode('ascii')]
@@ -40,7 +40,7 @@ class Throttle(TwarfRule):
         self.fwd = fwd
         self.delay = delay
 
-    async def __call__(self, request):
+    async def process(self, request):
         await asyncio.sleep(self.delay)
         await self.fwd(request)
 

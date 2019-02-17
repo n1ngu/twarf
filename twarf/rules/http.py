@@ -13,7 +13,7 @@ SERVER = b'Twarf/%s' % twarf.__version__.encode()
 
 class Finish(TwarfRule):
 
-    async def __call__(self, request):
+    async def process(self, request):
         request.setHeader(b'server', SERVER)
         request.setHeader(b'date', twisted.web.http.datetimeToString())
         request.finish()
@@ -23,16 +23,16 @@ class HttpStatus(Finish):
 
     http_status = None
 
-    async def __call__(self, request):
+    async def process(self, request):
         request.setResponseCode(self.http_status)
-        await super().__call__(request)
+        await super().process(request)
 
 
 class TempRedirect(Finish):
 
-    async def __call__(self, request):
+    async def process(self, request):
         request.temporary_redirect(request.uri)
-        await super().__call__(request)
+        await super().process(request)
 
 
 class Unauthorized(HttpStatus):

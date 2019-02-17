@@ -13,7 +13,7 @@ class LogRequest(TwarfRule):
         self.fwd = fwd
         self.service = service
 
-    async def __call__(self, request):
+    async def process(self, request):
         await self.service.log('%s', request)
         await self.fwd(request)
 

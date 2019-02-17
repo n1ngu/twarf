@@ -4,8 +4,6 @@ import urllib.parse
 import twarf.service.session
 import twarf.service.crypto
 
-from . import TwarfRule
-from . import TwarfTest
 from .flow import If
 from .http import Finish
 from .forward import Forward
@@ -161,7 +159,7 @@ class JsRedirectChallenge(Finish):
 # TODO: captchas!
 
 
-def twarf_rules(reactor) -> TwarfRule:
+def twarf_rules(reactor):
 
     session_srv = twarf.service.session.SessionService()
     crypto_srv = twarf.service.crypto.CryptoService([

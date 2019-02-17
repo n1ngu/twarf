@@ -11,10 +11,13 @@ class CryptoService():
             cryptography.fernet.Fernet(key)
             for key in keys
         ])
-        assert b'assert' == self.key.decrypt(self.key.decrypt(b'assert'))
+        assert b'assert' == self.key.decrypt(self.key.encrypt(b'assert'))
 
     async def encrypt(self, message: bytes) -> bytes:
         return self.key.encrypt(message)
 
     async def decrypt(self, message: bytes) -> bytes:
-        return self.key.decrypt(message)
+        try:
+            return self.key.decrypt(message)
+        except cryptography.fernet.InvalidToken:
+            return None

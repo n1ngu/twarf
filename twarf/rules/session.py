@@ -13,11 +13,12 @@ COOKIE = b'TWARFSESSIONID'
 
 class SetCookie(TempRedirect):
 
-    def __init__(self, service):
+    def __init__(self, service, value):
         self.service = service
+        self.value = value
 
     async def process(self, request):
-        cookie = await self.service.new()
+        cookie = await self.service.new(self.value)
         request.addCookie(COOKIE, cookie)
         await super().process(request)
 
@@ -39,7 +40,7 @@ def twarf_rules(reactor) -> TwarfRule:
     session_service = twarf.service.session.SessionService()
 
     return If(
-        test=MatchCookie(session_service, 0),
+        test=MatchCookie(session_service, b'twarf'),
         then=Forward(reactor),
-        orelse=SetCookie(session_service),
+        orelse=SetCookie(session_service, b'twarf'),
     )

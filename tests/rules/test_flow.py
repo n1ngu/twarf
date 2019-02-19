@@ -4,6 +4,7 @@ from aiounittest import AsyncTestCase
 from aiounittest import futurized
 
 from twarf.rules.flow import If
+from twarf.rules.flow import Try
 
 
 class IfTest(AsyncTestCase):
@@ -41,3 +42,32 @@ class IfTest(AsyncTestCase):
         test.assert_called_once_with(request)
         then.assert_not_called()
         orelse.assert_called_once_with(request)
+
+
+class TryTest(AsyncTestCase):
+
+    async def test_pass(self):
+        request = Mock()
+        body = Mock(return_value=futurized(None))
+        fail = Mock(return_value=futurized(None))
+
+        await Try(
+            body=body,
+            fail=fail,
+        )(request)
+
+        body.assert_called_once_with(request)
+        fail.assert_not_called()
+
+    async def test_fail(self):
+        request = Mock()
+        body = Mock(return_value=futurized(Exception('Dummy error')))
+        fail = Mock(return_value=futurized(None))
+
+        await Try(
+            body=body,
+            fail=fail,
+        )(request)
+
+        body.assert_called_once_with(request)
+        fail.assert_called_once_with(request)

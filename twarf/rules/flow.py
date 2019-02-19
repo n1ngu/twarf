@@ -18,6 +18,19 @@ class If(TwarfRule):
             await self.orelse(request)
 
 
+class Try(TwarfRule):
+
+    def __init__(self, body: TwarfTest, fail: TwarfRule):
+        self.body = body
+        self.fail = fail
+
+    async def process(self, request):
+        try:
+            await self.body(request)
+        except:
+            await self.fail(request)
+
+
 class Unreachable(InternalServerError):
 
     async def process(self, request):

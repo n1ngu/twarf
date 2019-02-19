@@ -68,7 +68,7 @@ class RedirectChallenge(_RedirectChallenge):
         request.temporary_redirect(location)
 
 
-class _HtmlRedirectChallenge(_RedirectChallenge):
+class _HtmlTemplateChallenge(_RedirectChallenge):
     """
     Redirect through a page with a <meta http-equiv="refresh"/> html tag
 
@@ -81,14 +81,12 @@ class _HtmlRedirectChallenge(_RedirectChallenge):
     TPL = b''
 
     async def challenge(self, request, location: bytes):
-        page = await self.template(request, location)
+        # FIXME: prevent downstream from caching this page
+        page = self.TPL % location
         request.write(page)
 
-    async def template(self, request, location: bytes):
-        return self.TPL % location
 
-
-class MetaRedirectChallenge(_HtmlRedirectChallenge):
+class MetaRedirectChallenge(_HtmlTemplateChallenge):
     """
     Redirect through a page with a <meta http-equiv="refresh"/> html tag
 
@@ -103,7 +101,7 @@ class MetaRedirectChallenge(_HtmlRedirectChallenge):
     """
 
 
-class JsRedirectChallenge(_HtmlRedirectChallenge):
+class JsRedirectChallenge(_HtmlTemplateChallenge):
     """
     Redirect through a page with javascript
 

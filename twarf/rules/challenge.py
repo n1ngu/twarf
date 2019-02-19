@@ -3,6 +3,7 @@ import urllib.parse
 
 import twarf.service.session
 import twarf.service.crypto
+import twarf._utils
 
 from .flow import If
 from .http import Finish
@@ -12,13 +13,9 @@ from .session import SetCookie
 from .session import MatchCookie
 
 
-class RedirectChallenge(Finish):
-    """
-    Redirect through a 307 response
+class _RedirectChallenge(Finish):
 
-    Drawbacks:
-      - Easily spoofable
-    """
+    REF = b'referer'
 
     def __init__(self,
                  next_challenge,
@@ -28,34 +25,70 @@ class RedirectChallenge(Finish):
         self.next_challenge = next_challenge
         self.crypto_srv = crypto_srv
         self.session_srv = session_srv
+        self.secret = twarf._utils.build_random_string()
 
     async def process(self, request):
         uri = urllib.parse.urlparse(
             request.uri
         )
         passed = await self.crypto_srv.decrypt(uri.path[1:])
-        if passed and passed == b'challengeA':
+        if passed and passed == self.secret:
             cookie = request.received_cookies.get(COOKIE)
+            await self.session_srv.put(cookie, self.next_challenge)
             query = urllib.parse.parse_qs(uri.query)
-            quoted_referers = query.get(b'referer')
+            quoted_referers = query.get(self.REF)
             if not quoted_referers:
                 raise NotImplementedError("")  # TODO: 400 BadRequest
             referer = urllib.parse.unquote_to_bytes(quoted_referers[0])
-            await self.session_srv.put(cookie, self.next_challenge)
             request.temporary_redirect(referer)
-            await super().process(request)
         else:
-            challenge = await self.crypto_srv.encrypt(b'challengeA')
+            challenge = await self.crypto_srv.encrypt(self.secret)
             referer = urllib.parse.quote_from_bytes(request.uri).encode()
-            query = urllib.parse.urlencode({b'referer': referer}).encode()
+            query = urllib.parse.urlencode({self.REF: referer}).encode()
             location = urllib.parse.urlunparse(
                 (None, None, challenge, None, query, None)
             )
-            request.temporary_redirect(location)
-            await super().process(request)
+            await self.challenge(request, location)
+
+        await super().process(request)
+
+    async def challenge(self, request, location: bytes):
+        raise NotImplementedError("")
 
 
-class MetaRedirectChallenge(Finish):
+class RedirectChallenge(_RedirectChallenge):
+    """
+    Redirect through a 307 response
+
+    Drawbacks:
+      - Easily spoofable
+    """
+
+    async def challenge(self, request, location: bytes):
+        request.temporary_redirect(location)
+
+
+class _HtmlRedirectChallenge(_RedirectChallenge):
+    """
+    Redirect through a page with a <meta http-equiv="refresh"/> html tag
+
+    Drawbacks:
+      - If it happens too often users might get stuck on pages, unable
+        to navigate backwards
+      - Original requests won't be replayed (POST, PUT, ...)
+    """
+
+    TPL = b''
+
+    async def challenge(self, request, location: bytes):
+        page = await self.template(request, location)
+        request.write(page)
+
+    async def template(self, request, location: bytes):
+        return self.TPL % location
+
+
+class MetaRedirectChallenge(_HtmlRedirectChallenge):
     """
     Redirect through a page with a <meta http-equiv="refresh"/> html tag
 
@@ -69,43 +102,8 @@ class MetaRedirectChallenge(Finish):
     <meta http-equiv="refresh" content="0; url=%s" />
     """
 
-    def __init__(self,
-                 next_challenge,
-                 crypto_srv,
-                 session_srv,
-                 ):
-        self.next_challenge = next_challenge
-        self.crypto_srv = crypto_srv
-        self.session_srv = session_srv
 
-    async def process(self, request):
-        uri = urllib.parse.urlparse(
-            request.uri
-        )
-        passed = await self.crypto_srv.decrypt(uri.path[1:])
-        if passed and passed == b'challengeB':
-            cookie = request.received_cookies.get(COOKIE)
-            query = urllib.parse.parse_qs(uri.query)
-            quoted_referers = query.get(b'referer')
-            if not quoted_referers:
-                raise NotImplementedError("")  # TODO: 400 BadRequest
-            referer = urllib.parse.unquote_to_bytes(quoted_referers[0])
-            await self.session_srv.put(cookie, self.next_challenge)
-            request.temporary_redirect(referer)
-            await super().process(request)
-        else:
-            challenge = await self.crypto_srv.encrypt(b'challengeB')
-            referer = urllib.parse.quote_from_bytes(request.uri).encode()
-            query = urllib.parse.urlencode({b'referer': referer}).encode()
-            location = urllib.parse.urlunparse(
-                (None, None, challenge, None, query, None)
-            )
-            page = self.TPL % location
-            request.write(page)
-            await super().process(request)
-
-
-class JsRedirectChallenge(Finish):
+class JsRedirectChallenge(_HtmlRedirectChallenge):
     """
     Redirect through a page with javascript
 
@@ -120,40 +118,6 @@ class JsRedirectChallenge(Finish):
     <script>window.location.replace("%s")</script>
     """
 
-    def __init__(self,
-                 next_challenge,
-                 crypto_srv,
-                 session_srv,
-                 ):
-        self.next_challenge = next_challenge
-        self.crypto_srv = crypto_srv
-        self.session_srv = session_srv
-
-    async def process(self, request):
-        uri = urllib.parse.urlparse(
-            request.uri
-        )
-        passed = await self.crypto_srv.decrypt(uri.path[1:])
-        if passed and passed == b'challengeB':
-            cookie = request.received_cookies.get(COOKIE)
-            query = urllib.parse.parse_qs(uri.query)
-            quoted_referers = query.get(b'referer')
-            if not quoted_referers:
-                raise NotImplementedError("")  # TODO: 400 BadRequest
-            referer = urllib.parse.unquote_to_bytes(quoted_referers[0])
-            await self.session_srv.put(cookie, self.next_challenge)
-            request.temporary_redirect(referer)
-            await super().process(request)
-        else:
-            challenge = await self.crypto_srv.encrypt(b'challengeB')
-            referer = urllib.parse.quote_from_bytes(request.uri).encode()
-            query = urllib.parse.urlencode({b'referer': referer}).encode()
-            location = urllib.parse.urlunparse(
-                (None, None, challenge, None, query, None)
-            )
-            page = self.TPL % location
-            request.write(page)
-            await super().process(request)
 
 # TODO: js payload challenge
 # TODO: captchas!

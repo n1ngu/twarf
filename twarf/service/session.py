@@ -1,6 +1,5 @@
 
-import string
-import random
+import twarf._utils
 
 
 class SessionService():
@@ -8,7 +7,6 @@ class SessionService():
     # FIXME: I am synchronous!
 
     _LEN = 64
-    _BASE = string.digits + string.ascii_letters
 
     def __init__(self):
         self._sessions = {}
@@ -20,8 +18,6 @@ class SessionService():
         self._sessions[key] = value
 
     async def new(self, value=0):
-        key = ''.join(
-            random.choice(self._BASE) for x in range(self._LEN)
-        ).encode('ascii')
+        key = twarf._utils.build_random_string(self._LEN)
         await self.put(key, value)
         return key

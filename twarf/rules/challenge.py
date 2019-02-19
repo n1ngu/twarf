@@ -117,6 +117,7 @@ class JsRedirectChallenge(_HtmlTemplateChallenge):
     """
 
 
+# TODO: challenge chain
 # TODO: js payload challenge
 # TODO: captchas!
 

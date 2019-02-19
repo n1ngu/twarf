@@ -125,6 +125,7 @@ def twarf_rules(reactor):
 
     session_srv = twarf.service.session.SessionService()
     crypto_srv = twarf.service.crypto.CryptoService([
+        # FIXME load from file stated in environ vars / options
         b'm848yHI9EE_m-PypvP8hDQvxdiMOJtw_JksWSblYHqY=',
         b'jSej64XRU1IYOZDYE62qtjdscog6HexjmjjP4M3cEoU=',
         b'L9HPLxa34i_fOWhPcPzEIzAHNYfkYChBwYIyEXVbAPs=',
@@ -134,8 +135,16 @@ def twarf_rules(reactor):
         test=MatchCookie(session_srv, b'valid'),
         then=Forward(reactor),
         orelse=If(
-            test=MatchCookie(session_srv, b'challenge1'),
+            test=MatchCookie(session_srv, b'x3'),
             then=JsRedirectChallenge(b'valid', crypto_srv, session_srv),
-            orelse=SetCookie(session_srv, b'challenge1'),
+            orelse=If(
+                test=MatchCookie(session_srv, b'x2'),
+                then=MetaRedirectChallenge(b'x3', crypto_srv, session_srv),
+                orelse=If(
+                    test=MatchCookie(session_srv, b'x1'),
+                    then=RedirectChallenge(b'x2', crypto_srv, session_srv),
+                    orelse=SetCookie(session_srv, b'x1'),
+                ),
+            ),
         ),
     )

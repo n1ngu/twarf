@@ -27,7 +27,7 @@ class Try(TwarfRule):
     async def process(self, request):
         try:
             await self.body(request)
-        except:
+        except Exception:
             await self.fail(request)
 
 

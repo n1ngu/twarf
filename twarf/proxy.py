@@ -3,6 +3,7 @@ import http
 
 import twisted.web.http
 import twisted.web.proxy
+import twisted.internet.defer
 
 
 class TwarfRequest(twisted.web.http.Request):

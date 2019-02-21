@@ -11,8 +11,8 @@ from . import TwarfRule
 class Forward(TwarfRule):
 
     def __init__(self, reactor,
-                 host=os.environ['TWARF_FORWARD_HOST'],
-                 port=int(os.environ['TWARF_FORWARD_PORT'])):
+                 host=os.environ.get('TWARF_FORWARD_HOST'),
+                 port=int(os.environ.get('TWARF_FORWARD_PORT', 0))):
         self.host = host
         self.endpoint = twisted.internet.endpoints.TCP4ClientEndpoint(
             reactor,

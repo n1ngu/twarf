@@ -30,7 +30,7 @@ class MatchCookie(TwarfTest):
         self.value = value
 
     async def test(self, request):
-        cookie = request.received_cookies.get(COOKIE)
+        cookie = request.getCookie(COOKIE)
         session = await self.service.get(cookie)
         return session == self.value
 

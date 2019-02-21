@@ -1,8 +1,10 @@
 
+import unittest.mock
 import aiounittest
 import twisted.web.test.requesthelper
 
 from twarf.rules.http import Finish
+from twarf.rules.http import TempRedirect
 from twarf.rules.http import Unauthorized
 from twarf.rules.http import BadRequest
 from twarf.rules.http import InternalServerError
@@ -20,8 +22,12 @@ class FinishTest(aiounittest.AsyncTestCase):
         self.assertTrue(request.responseHeaders.hasHeader(b'date'))
 
 
-# TODO: TempRedirectTest (request.temporary_redirect is a
-# TwarfRequest-only feature)
+class TempRedirectTest(aiounittest.AsyncTestCase):
+
+    async def test_rule(self):
+        request = unittest.mock.Mock(uri=b'uri')
+        await TempRedirect()(request)
+        request.temporary_redirect.assert_called_once_with(b'uri')
 
 
 class UnauthorizedTest(aiounittest.AsyncTestCase):

@@ -5,11 +5,26 @@ import aiounittest
 import twarf.proxy
 
 from twarf.rules.session import COOKIE
+from twarf.rules.session import SetCookie
 from twarf.rules.session import MatchCookie
 
 
-# TODO: SetCookietTest (request.temporary_redirect is a
-# TwarfRequest-only feature)
+class SetCookieTest(aiounittest.AsyncTestCase):
+
+    async def test_rule(self):
+        session_srv = unittest.mock.Mock(**{
+            'new.return_value': aiounittest.futurized(b'new_cookie')
+        })
+        channel = unittest.mock.Mock()
+        request = twarf.proxy.TwarfRequest(channel)
+
+        await SetCookie(session_srv, b'default_state')(request)
+
+        session_srv.new.assert_called_with(b'default_state')
+        self.assertEqual(
+            request.cookies,
+            [COOKIE + b'=new_cookie']
+        )
 
 
 class MatchCookieTest(aiounittest.AsyncTestCase):

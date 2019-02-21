@@ -3,7 +3,27 @@ import unittest.mock
 import twisted.trial.unittest
 import twisted.test.proto_helpers
 
+from twarf.proxy import TwarfRequest
 from twarf.proxy import TwarfFactory
+
+
+class RequestTest(twisted.trial.unittest.TestCase):
+
+    def test_temporary_redirect(self):
+        channel = unittest.mock.Mock()
+        request = TwarfRequest(channel)
+        request.temporary_redirect(b'somewhere')
+        self.assertEqual(
+            request.code,
+            307
+        )
+        self.assertTrue(
+            request.responseHeaders.hasHeader(b'location')
+        )
+        self.assertEqual(
+            request.responseHeaders.getRawHeaders(b'location'),
+            [b'somewhere']
+        )
 
 
 class ProxyTest(twisted.trial.unittest.TestCase):

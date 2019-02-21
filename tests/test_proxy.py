@@ -13,17 +13,10 @@ class RequestTest(twisted.trial.unittest.TestCase):
         channel = unittest.mock.Mock()
         request = TwarfRequest(channel)
         request.temporary_redirect(b'somewhere')
-        self.assertEqual(
-            request.code,
-            307
-        )
-        self.assertTrue(
-            request.responseHeaders.hasHeader(b'location')
-        )
-        self.assertEqual(
-            request.responseHeaders.getRawHeaders(b'location'),
-            [b'somewhere']
-        )
+        headers = request.responseHeaders
+        self.assertEqual(request.code, 307)
+        self.assertTrue(headers.hasHeader(b'location'))
+        self.assertEqual(headers.getRawHeaders(b'location'), [b'somewhere'])
 
 
 class ProxyTest(twisted.trial.unittest.TestCase):

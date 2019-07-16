@@ -16,3 +16,4 @@ twarf = {editable = true,extras = ["dev"],path = "."}
 python_version = "3.7"
 
 [scripts]
+tests = "python -m twisted.trial tests"
